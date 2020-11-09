@@ -1,6 +1,6 @@
 # JetBlue ByBlue Twilio Flex POC - Flex Plugin
 
-Twilio Flex allows customer to customize the Flex UI by createing Flex Plugins built with React.js. 
+Twilio Flex allows customer to customize the Flex UI by creating Flex Plugins built with React.js. 
 
 <p aligh="center">
     <img src="assets/plugin-jtp-byblue.png">
@@ -57,7 +57,7 @@ When you are ready to deploy your plugin, in your terminal run:
 $ twilio flex:plugins:deploy --major --changelog "Initial plugin deployment" --description "ByBlue Flex POC"
 ```
 
-This will deploy your plugin to your Twilio Flex Project. See [Deploy and release using the Flex Plugins CLI](https://www.twilio.com/docs/flex/developer/plugins/cli/deploy-and-release#deploying-a-major-version-of-a-plugin) for more informaiton
+This will deploy your plugin to your Twilio Flex Project. See [Deploy and release using the Flex Plugins CLI](https://www.twilio.com/docs/flex/developer/plugins/cli/deploy-and-release#deploying-a-major-version-of-a-plugin) for more information
 
 ## Release
 Last step is to release the plugin.  The above command will provide the text to copy and paste for releasing the plugin. The text will look like:
@@ -67,14 +67,14 @@ $ twilio flex:plugins:release --plugin plugin-jtp-byblue@1.0.0 --name "Autogener
 ```
 ## Configuration
 
-This plugin will leverage data that is both passed from Twilio Stuidio as well as data pulled from a Twilio Function.
+This plugin will leverage data that is both passed from Twilio Studio as well as data pulled from a Twilio Function.
 
 ### Studio
 
 Using Twilio Studio set these task attributes on the Send to Flex widget. 
 
-* crmId - Set this to a unique identifier for the cusomter
-* name - Custome name, this will also be used on the first line of the contact card
+* crmId - Set this to a unique identifier for the customer
+* name - Customer name, this will also be used on the first line of the contact card
 * phone - Callers phone number `{{trigger.call.From}}`
 * email - Callers email address
 * address - Callers address
@@ -87,22 +87,22 @@ The `src\` folder contains all the files that make up this plugin.
 
 - `src\JTPByBluePlugin.js` - This is the main plugin file. This fill performs the following
   - Loads a custom theme from JTPTheme.js
-  - Adds additional infomation to the TaskInfoPanel
+  - Adds additional information to the TaskInfoPanel
   - Sets the default width of the Task splitter
   - Adds Listners (Used in Panel2.js) to set state data
-  - Sets the CRM windo (Panel 2) to the panel2.js file
+  - Sets the CRM window (Panel 2) to the panel2.js file
 - `components\Panel2.js` - The basic structure of CRM/Panel2
   - Maps TaskAttributes to the contactData state
   - Runs a Twilio Function to return the Offer object
   - Maps the Offer to the contactData state
-  - Check if to see if a task is selected and calls the apppriate React Components
+  - Check if to see if a task is selected and calls the appropriate React Components
 - `components\InfoComponent.js` - React Component for building the text elements of the various view.
 - `components\SubheadingComponent.js` - React component for building the header of the various views
 - `components\CustomerView.js` - Customer View with the Click to Call action `startOutboundCall`
 - `components\GeneralView.js` - General view use to iframe the crmUrl attribute, this is not in use for this example.
 - `components\OfferView.js` - Offer view used to display data from the Offer json object.  This Component calls the `get-offer.js` function.
 - `components\SmsView.js` - SMS view use to enter a message and deliver it for SMS.  This component calls the `send-sms.js` function. **Note:** This view will not load for SMS tasks. 
-- `src\functions\` - contains the .js function code for Twilio Funcitons  **Note:** These functions were originally deployed with Functions V1 by copying over to Twilio Functions. For prodcution it is recommended to use Twilio Serverless. 
+- `src\functions\` - contains the .js function code for Twilio Functions  **Note:** These functions were originally deployed with Functions V1 by copying over to Twilio Functions. For production it is recommended to use Twilio Serverless. 
 
 
 ---
