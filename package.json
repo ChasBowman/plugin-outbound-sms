@@ -1,0 +1,29 @@
+{
+  "name": "plugin-jtp-byblue",
+  "version": "2.0.2",
+  "private": true,
+  "scripts": {
+    "postinstall": "flex-plugin pre-script-check"
+  },
+  "dependencies": {
+    "react": "16.5.2",
+    "react-dom": "16.5.2",
+    "flex-plugin-scripts": "4.3.5-beta.0"
+  },
+  "devDependencies": {
+    "@twilio/flex-ui": "^1",
+    "flex-plugin-scripts": "^4.0.7-beta.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
