@@ -5,14 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import { withTaskContext } from '@twilio/flex-ui';
 
 // import generic UX components
-import InfoComponent from "./InfoComponent";
 import SubheadingComponent from "./SubheadingComponent";
-
-// import icons
-import PhoneIcon from "@material-ui/icons/Phone";
-import PersonIcon from "@material-ui/icons/Person";
-
-
 
 class SmsView extends React.Component {
   constructor(props) {
@@ -24,11 +17,10 @@ class SmsView extends React.Component {
   state = { 
     smsBody: '',
     toNumber: '',
-    fromNumber: '+16306347877', 
+    fromNumber: process.env.REACT_APP_DEFAULT_TWILIO_NUMBER, 
     name: 'Customer'
   } 
-  
-  
+    
   componentDidMount() {
     if (this.props.task && this.props.task.attributes) { 
     const { dnis, from, name } = this.props.task.attributes;
@@ -43,7 +35,6 @@ class SmsView extends React.Component {
   startNotification() {
     console.log(`Running SMS Contact--> ${this.state.smsBody}`);
     console.log(this.props.manager);
-    // Call Function  -----------------------------
     // Set the query for the Twilio Funciton
     const functionQuery = { 
       toNumber: this.state.toNumber,
@@ -60,7 +51,7 @@ class SmsView extends React.Component {
       }
     };
     // Make the function call using Fetch
-    fetch('https://charcoal-trout-2362.twil.io/flex-send-sms', options)
+    fetch(process.env.REACT_APP_SERVICE_BASE_URL + '/flex-send-sms', options)
       .then(resp => resp.json())
       .then(resp => {
         console.log("SMS Sent");
@@ -75,7 +66,7 @@ class SmsView extends React.Component {
     // console.log(task);
     
     const name = (this.state.name) !== "" ? this.state.name : this.state.toNumber;
-    const smsURL = `https://charcoal-trout-2362.twil.io/flex-sms-chat?fromNumber=${encodeURIComponent(this.state.fromNumber)}&toName=${encodeURIComponent(name)}&toNumber=${encodeURIComponent(this.state.toNumber)}}`;
+    const smsURL = process.env.REACT_APP_SERVICE_BASE_URL + `/flex-sms-chat?fromNumber=${encodeURIComponent(this.state.fromNumber)}&toName=${encodeURIComponent(name)}&toNumber=${encodeURIComponent(this.state.toNumber)}&workerUri=${encodeURIComponent(this.props.manager.workerClient.attributes.contact_uri)}}`;
     console.log('URL: ' + smsURL);
     fetch(smsURL)
       .then(result => result.json())
@@ -86,29 +77,24 @@ class SmsView extends React.Component {
 
   render() { 
 
-    console.log("Running CustomerView");
-
     if (this.props.task && this.props.task.attributes) { 
       if (this.props.task.channelType === "sms") return (null);
-      let {
-			  workflowName,
-			  queueName,
-        taskSid,
-        channelType
-      } = this.props.task;
-      let {
-			  name,
-			  ani,
-        dnis,
-        from,
-			  email,
-        address,
-        crmid,
-			  crmurl,
-			  taskIntent
-      } = this.props.task.attributes
+      // let {
+      //   channelType
+      // } = this.props.task;
+      // let {
+			//   name,
+			//   ani,
+      //   dnis,
+      //   from,
+			//   email,
+      //   address,
+      //   crmid,
+			//   crmurl,
+			//   taskIntent
+      // } = this.props.task.attributes
 
-      console.log("Channel Type: ", channelType);
+      console.log("Channel Type: ", this.props.task.channelType);
       console.log("Task: ");
       console.log(this.props.task);
     }
@@ -118,9 +104,18 @@ class SmsView extends React.Component {
          <div style={styles.panel3Container}>
         <SubheadingComponent title="Send SMS" />
         <div style={styles.card}>
-          <InfoComponent title="Name" value={name} icon={<PersonIcon />} hr={true} />
+          {/* <InfoComponent title="Name" value={name} icon={<PersonIcon />} hr={true} /> */}
           {/* <InfoComponent title="Customer Phone" value={from} icon={<PhoneIcon />} hr={true} /> */}
           {/* <InfoComponent title="Send SMS From" value={dnis} icon={<PhoneIcon />} hr={true} /> */}
+          <TextField
+            id='Name'
+            label='Customer Name'
+            style={styles.textInput}
+            value={this.state.name}
+            onChange={(e) => this.handleChange("name", e)}
+            margin='normal'
+            variant='outlined'
+          />
           <TextField
             id='Twilio Number'
             label='Twilio Number'

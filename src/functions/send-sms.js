@@ -19,7 +19,7 @@
     let toNumber = event.toNumber;
     // the fromNumber could be hard coded instead of being recieved from the plugin.
     let fromNumber = event.fromNumber;
-    // let fromNumber = '+14422222283';
+    // let fromNumber = '+XXXXXXXXXXX';
     
     //  perform error checking on toNumber
     toNumber = toNumber.trim();

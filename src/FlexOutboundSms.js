@@ -19,6 +19,9 @@ export default class FlexOutboundSms extends FlexPlugin {
    */
   init(flex, manager) {
 
+    console.log('--- Running FlexOutboundSms ---');
+    console.log(manager);
+
     // Adding SMS View to panel3
     flex.AgentDesktopView.Content.add(
       <SmsView key="SmsView-panel3" label="Sms" flex={flex} manager={manager} inPanel3/>);

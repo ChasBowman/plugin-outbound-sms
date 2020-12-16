@@ -5,8 +5,6 @@
         fromNumber
         toName
         toNumber
-        email
-        crmid
         workerUri
 
     ACCESS CONTROL: Uncheck valid Twilio signature
@@ -23,7 +21,7 @@ const verifyEventProps = (event) => {
   };
 
   console.log(event);
-  const { fromNumber, toName, toNumber, email, crmid, workerUri } = event;
+  const { fromNumber, toName, toNumber, workerUri } = event;
 
   if (!fromNumber) {
     result.message = "Missing 'fromNumber' in request body";
@@ -81,7 +79,7 @@ const getFlexFlow = (context, fromNumber) => new Promise(async (resolve, reject)
 });
 
 const createChatChannelWithTask = (
-  context, flexFlowSid, identity, toNumber, toName, fromNumber, email, crmid, workerUri
+  context, flexFlowSid, identity, toNumber, toName, fromNumber, workerUri
 ) => new Promise(async (resolve, reject) => {
   const flexChannelsApi = 'https://flex-api.twilio.com/v1/Channels';
 
@@ -96,13 +94,8 @@ const createChatChannelWithTask = (
     direction: 'outbound',
     name: toName,
     from: toNumber,
-    crmid: crmid,
-    email: email,
-    crmurl: `https://app.hubspot.com/contacts/4971620/contacts/${crmid}`,
     targetWorker: workerUri,
-    autoAnswer: true,
-    brandLogo: `https://charcoal-trout-2362.twil.io/assets/panel2-logo.png`,
-    brandName: 'Escalate Channel', 
+    autoAnswer: true, 
     taskIntent: `SMS Chat to ${toName}`,
   };
   urlParams.append('TaskAttributes', JSON.stringify(taskAttributes));
@@ -133,7 +126,7 @@ const createChatChannelWithTask = (
 });
 
 const createProxySession = (
-  context, chatChannelSid, toNumber, toName, fromNumber, email, crmid, workerUri
+  context, chatChannelSid, toNumber, toName, fromNumber, workerUri
 ) => new Promise(async (resolve, reject) => {
   const client = Twilio(context.ACCOUNT_SID, context.AUTH_TOKEN);
   const proxyClient = client.proxy.services(context.TWILIO_PROXY_SERVICE_SID);
@@ -184,7 +177,7 @@ exports.handler = async function(context, event, callback) {
     return callback(null, response);
   }
 
-  const { fromNumber, toName, toNumber, email, crmid, workerUri } = event;
+  const { fromNumber, toName, toNumber, workerUri } = event;
 
   let flexFlow;
   try {
@@ -210,7 +203,7 @@ exports.handler = async function(context, event, callback) {
   let chatChannel;
   try {
     chatChannel = await createChatChannelWithTask(
-      context, flexFlowSid, identity, toNumber, toName, fromNumber, email, crmid, workerUri
+      context, flexFlowSid, identity, toNumber, toName, fromNumber, workerUri
     );
   } catch (error) {
     response.setStatusCode(error && error.status);
@@ -238,7 +231,7 @@ exports.handler = async function(context, event, callback) {
   let proxySession;
   try {
     proxySession = await createProxySession(
-      context, chatChannel.sid, toNumber, toName, fromNumber, email, crmid, workerUri
+      context, chatChannel.sid, toNumber, toName, fromNumber, workerUri
     );
   } catch (error) {
     response.setStatusCode(error && error.status);
