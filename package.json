@@ -1,6 +1,6 @@
 {
-  "name": "plugin-jtp-byblue",
-  "version": "2.0.2",
+  "name": "plugin-outbound-sms",
+  "version": "1.0.7",
   "private": true,
   "scripts": {
     "postinstall": "flex-plugin pre-script-check"
@@ -11,19 +11,6 @@
     "flex-plugin-scripts": "4.3.5-beta.0"
   },
   "devDependencies": {
-    "@twilio/flex-ui": "^1",
-    "flex-plugin-scripts": "^4.0.7-beta.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@twilio/flex-ui": "^1"
   }
 }

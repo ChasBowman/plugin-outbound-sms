@@ -1,4 +1,4 @@
 import * as FlexPlugin from 'flex-plugin';
-import JTPByBluePlugin from './JTPByBluePlugin';
+import FlexOutboundSms from './FlexOutboundSms.js';
 
-FlexPlugin.loadPlugin(JTPByBluePlugin);
+FlexPlugin.loadPlugin(FlexOutboundSms);
