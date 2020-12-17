@@ -1,6 +1,6 @@
 # Flex Outbound SMS Plugin
 
-Twilio Flex allows customer to customize the Flex UI by creating Flex Plugins built with React.js. 
+Twilio Flex allows customers to customize the Flex UI by creating Flex Plugins built with React.js. 
 
 <p align="center">
     <img src="assets/FlexOutboundSms.png" height="200" >
@@ -42,7 +42,7 @@ This plugin will populate the SMS field values if there is an existing non-sms t
 
 ### Create Outbound Flex Flows
 
-Run the following Twilio CLI command for each phone number that will be use to create Flex Tasks for outbound SMS. You will need the following informaiton:
+Run the following Twilio CLI command for each phone number that will be used to create Flex Tasks for outbound SMS. You will need the following information:
    * [Twilio Phone Number in E.164 format]()
    * [Flex Chat Service SID](https://www.twilio.com/console/chat/dashboard)
    * [Flex Task Assignment TaskRouter Workspace SID](https://www.twilio.com/console/taskrouter/workspaces)
@@ -64,7 +64,7 @@ This Flex Plugin leverages 2 Twilio Functions, located in the `functions` folder
    * twilio-flex-token-validator
    * node-fetch
    * js-base64
-5. [Deploy Functions](https://www.twilio.com/console/functions/manage) and make sure Check fo Valid Twilio signature is unchecked. 
+5. [Deploy Functions](https://www.twilio.com/console/functions/manage) and make sure Check for Valid Twilio signature is unchecked. 
    * flex-sms-task.js
    * send-sms.js
 
@@ -77,6 +77,8 @@ Copy .env.example to .env. and set the following variables:
    * REACT_APP_DEFAULT_TWILIO_NUMBER: The default Twilio Number to be used for sending sms messages, in E.164 format. 
 
   **Note**: Remember that both .env.development and .env.production is for front-end use so do not add any type of key/secret variable to them. When developing, the .env.development is used while the .env.production is used when building and deploying the plugin. Also, just variables starting with the name *REACT_APP_* will work.
+
+  **Note** This Plugin is setup to allow the customer to override the From phone number. For production deployments, consider how to set the phone number.  Each phone number will need a Flex Flow.  Consider using a list in the ENV variables, pulling the numbers from TaskRouter or Sync. 
 
 ### Installing dependencies 
 Open terminal and navigate to the plugin directory, install the dependencies by running 
@@ -114,11 +116,9 @@ $ twilio flex:plugins:release --plugin plugin-outbound-sms@1.0.0 --name "Autogen
 
 ## Plugin Structure
 
-The `src\` folder contains all the files that make up this plugin. 
-
 - `src\FlexOutboundSms.js` - This is the main plugin file and loads SmsView.js into Panel3
 - `components\SubheadingComponent.js` - React component for building the header of the various views
-- `components\SmsView.js` - SMS view use to enter a message and deliver it for SMS.  This component calls the `send-sms.js` and `flex-sms-task.js` function.
+- `components\SmsView.js` - SMS view uses to enter a message and deliver it for SMS.  This component calls the `send-sms.js` and `flex-sms-task.js` function.
 - `src\functions\` - contains the .js function code for Twilio Functions  **Note:** These functions were originally deployed with Functions V1 by copying over to Twilio Functions. For production it is recommended to use Twilio Serverless. 
 
 
