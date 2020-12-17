@@ -18,7 +18,9 @@ class SmsView extends React.Component {
     smsBody: '',
     toNumber: '',
     fromNumber: process.env.REACT_APP_DEFAULT_TWILIO_NUMBER, 
-    name: 'Customer'
+    name: 'Customer',
+    submitDisabledChat: true,
+    submitDisabledSms: true
   } 
     
   componentDidMount() {
@@ -29,7 +31,7 @@ class SmsView extends React.Component {
   }
 
 	handleChange = (field, e) => this.setState({ 
-		[field]: e.target.value 
+    [field]: e.target.value 
 	}) 
 
   startNotification() {
@@ -65,30 +67,37 @@ class SmsView extends React.Component {
     console.log(this.props.manager);
     console.log(this.props.manager.workerClient.attributes.contact_uri);
     console.log((this.state.smsBody) !== "" ? this.state.smsBody : "Initial Message");
-    // Set the query for the Twilio Funciton
-    const functionQuery = { 
-      toNumber: this.state.toNumber,
-      fromNumber: this.state.fromNumber,
-      toName: (this.state.name) !== "" ? this.state.name : this.state.toNumber,
-      message: (this.state.smsBody) !== "" ? this.state.smsBody : "Initial Message",
-      workerUri: this.props.manager.workerClient.attributes.contact_uri,
-      Token: this.props.manager.store.getState().flex.session.ssoTokenPayload.token
-    };
-    // Set the HTTP Option for the Twilio Function call
-    const options = {
-      method: 'POST',
-      body: new URLSearchParams(functionQuery),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }
-    };
-    // Make the function call using Fetch
-    fetch(process.env.REACT_APP_SERVICE_BASE_URL + '/flex-sms-task', options)
-      .then(resp => resp.json())
-      .then(resp => {
-        console.log("SMS Task Created");
-        this.setState({ smsBody: '', toNumber: ''});
-      })
+
+    if (!this.state.toNumber) {
+      alert('Please enter a phone number');
+    } else if (!this.state.smsBody) {
+      alert('Please enter the SMS message');
+    } else {
+      // Set the query for the Twilio Funciton
+      const functionQuery = { 
+        toNumber: this.state.toNumber,
+        fromNumber: this.state.fromNumber,
+        toName: (this.state.name) !== "" ? this.state.name : this.state.toNumber,
+        message: (this.state.smsBody) !== "" ? this.state.smsBody : "Initial Message",
+        workerUri: this.props.manager.workerClient.attributes.contact_uri,
+        Token: this.props.manager.store.getState().flex.session.ssoTokenPayload.token
+      };
+      // Set the HTTP Option for the Twilio Function call
+      const options = {
+        method: 'POST',
+        body: new URLSearchParams(functionQuery),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        }
+      };
+      // Make the function call using Fetch
+      fetch(process.env.REACT_APP_SERVICE_BASE_URL + '/flex-sms-task', options)
+        .then(resp => resp.json())
+        .then(resp => {
+          console.log("SMS Task Created");
+          this.setState({ smsBody: '', toNumber: ''});
+        })
+    }
   }
 
   render() { 
@@ -147,7 +156,7 @@ class SmsView extends React.Component {
           <Fab variant="extended" size="small" style={styles.button} aria-label="SMS Notification" onClick={this.startNotification} >
             Send SMS
           </Fab>
-          <Fab variant="extended" size="small" style={styles.button} aria-label="SMS Chat" onClick={e => this.startChat(this.props.task)} >
+          <Fab variant="extended" size="small" disabled={this.state.submitDisabled} style={styles.button} aria-label="SMS Chat" onClick={e => this.startChat(this.props.task)} >
             New SMS Chat
           </Fab>
         </div>
