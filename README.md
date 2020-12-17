@@ -24,15 +24,36 @@ To deploy this plugin, you will need:
    ```
 - Pull this git repo to your local machine
 
-## Create Outbound Flex Flows
+### TaskRouter
+Follow these steps to create or modify a TaskRouter Workflow to add a filter to ensure that task is assigned to the Worker that created the SMS Chat.  
 
-Run the following Twilio CLI command for each phone number that will be use to create Flex Tasks for outbound SMS. 
+1. Open Twilio Console and navigate to [TaskRouter Workspace](https://www.twilio.com/console/taskrouter/workspaces)
+2. Open *Flex Task Assignment*
+3. Open *Workflows*
+4. Open the desired Workflow or create a new one.  For these instructions we will open *Assign to Anyone*. **Note:** You will use the SID from this Workflow in the next section. 
+5. Create a new filter with the *Add a Filter* button and enter `targetWorker` as the title
+6. Set the *Matching Tasks* expression to `targetWorker != null`
+7. Select the desired Queue
+8. Set the *Expression* to `worker.contact_uri == task.targetWorker`
+9. Save the Workflow
+
+### Studio
+This plugin will populate the SMS field values if there is an existing non-sms task selected. The Customer Name is set from the task attribute *name* value. The Customer Phone Number is set from the task attribute *from* value. By default, Studio sets *name* to the incoming phone number and does not set a default *from* value. These values can be updated in the Studio Flow.
+
+### Create Outbound Flex Flows
+
+Run the following Twilio CLI command for each phone number that will be use to create Flex Tasks for outbound SMS. You will need the following informaiton:
+   * [Twilio Phone Number in E.164 format]()
+   * [Flex Chat Service SID](https://www.twilio.com/console/chat/dashboard)
+   * [Flex Task Assignment TaskRouter Workspace SID](https://www.twilio.com/console/taskrouter/workspaces)
+   * [Flex Task Assignment Workflow SID](https://www.twilio.com/console/taskrouter/workspaces) (The Workflow that will deliver the call to the worker that initialized the SMS)
+   * [Task Channel SID for Programmable Chat TaskChannel](https://www.twilio.com/console/taskrouter/workspaces)
 
 ```bash
-twilio api:flex:v1:flex-flows:create --integration-type task --no-enabled  --friendly-name "Outbound Flex Flow" --channel-type sms --contact-identity +XXXXXXXXXXX --chat-service-sid ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.workspace-sid WSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.workflow-sid WWXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.channel TCXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --janitor-enabled
+$ twilio api:flex:v1:flex-flows:create --integration-type task --no-enabled  --friendly-name "Outbound Flex Flow" --channel-type sms --contact-identity +XXXXXXXXXXX --chat-service-sid ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.workspace-sid WSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.workflow-sid WWXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --integration.channel TCXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --janitor-enabled
 ```
 
-## Prerequisite Function
+### Deploy Functions
 
 This Flex Plugin leverages 2 Twilio Functions, located in the `functions` folder. After deploying the Twilio Functions. This version leverages Functions (Classic).
 
@@ -43,12 +64,13 @@ This Flex Plugin leverages 2 Twilio Functions, located in the `functions` folder
    * twilio-flex-token-validator
    * node-fetch
    * js-base64
-5. [Deploy Functions](https://www.twilio.com/console/functions/manage)
+5. [Deploy Functions](https://www.twilio.com/console/functions/manage) and make sure Check fo Valid Twilio signature is unchecked. 
    * flex-sms-task.js
    * send-sms.js
+
 ## How to use the Plugin
 
-### Environment Variables
+### React Environment Variables
 
 Copy .env.example to .env. and set the following variables:
    * REACT_APP_SERVICE_BASE_URL: your Twilio Functions base url (this will be available after you deploy your functions). This should be just the base url (Example: https://some-words-1234.twil.io make sure to not include anything after the .io) 
@@ -78,7 +100,7 @@ This will automatically start up the Webpack Dev Server and open the browser for
 When you are ready to deploy your plugin, in your terminal run:
 
 ```bash
-$ twilio flex:plugins:deploy --major --changelog "Initial plugin deployment" --description "ByBlue Flex POC"
+$ twilio flex:plugins:deploy --major --changelog "Initial plugin deployment" --description "Flex Outbound SMS Plugin"
 ```
 
 This will deploy your plugin to your Twilio Flex Project. See [Deploy and release using the Flex Plugins CLI](https://www.twilio.com/docs/flex/developer/plugins/cli/deploy-and-release#deploying-a-major-version-of-a-plugin) for more information

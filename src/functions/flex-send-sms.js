@@ -28,10 +28,8 @@
     if (toNumber.indexOf('+') == -1) {
       toNumber = '+' + toNumber
     }    
-    console.log('toNum: ' + toNumber);
-  
+      
     let msg = event.message;
-    console.log('msg: ' + msg);
     
     let response = new Twilio.Response();
       let headers = {

@@ -30,7 +30,6 @@ class SubheadingComponent extends React.Component {
       container: {
         padding: 10,
         margin: "0 20px 0px 20px",
-        fontfamily: "Open Sans",
         fontSize: "12px",
         fontWeight: "bold",
         fontStyle: "normal",
@@ -46,7 +45,6 @@ class SubheadingComponent extends React.Component {
         padding: 10,
         margin: "0 20px 0px 20px",
         borderRadius: "13px 13px 0px 0px",
-        fontfamily: "Open Sans",
         fontSize: "12px",
         fontWeight: "bold",
         fontStyle: "normal",

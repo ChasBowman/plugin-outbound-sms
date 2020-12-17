@@ -6,6 +6,8 @@
         toName
         toNumber
         workerUri
+        message
+        Token
 
     ACCESS CONTROL: Uncheck valid Twilio signature
 */
@@ -14,6 +16,20 @@ const nodeFetch = require('node-fetch');
 const { URLSearchParams } = require('url');
 const uuidv1 = require('uuid/v1');
 const { Base64 } = require('js-base64');
+const TokenValidator = require('twilio-flex-token-validator').functionValidator;
+
+
+exports.handler = TokenValidator(async function(context, event, callback) {
+console.log("--- Starting ---");
+
+const client = new Twilio(context.ACCOUNT_SID, context.AUTH_TOKEN);
+
+console.log("Token Validated");
+console.log(event.toNumber);
+console.log(event.fromNumber);
+console.log(event.toName);
+console.log(event.message);
+console.log(event.workerUri);
 
 const verifyEventProps = (event) => {
   const result = {
@@ -125,10 +141,33 @@ const createChatChannelWithTask = (
   return resolve(jsonResponse);
 });
 
+const createMessage = (
+  context, chatChannelSid, toNumber, toName, fromNumber, workerUri, message
+) => new Promise(async (resolve, reject) => {
+  // const client = new Twilio(context.ACCOUNT_SID, context.AUTH_TOKEN);
+  //const chatClient = client.chat.services(context.TWILIO_CHAT_SERVICE_SID);
+  console.log("Adding Message");
+  let chatMessage;
+  try {
+  const messageResources = { "from": "System", "body": message }
+    chatMessage = await client.chat.services(context.TWILIO_CHAT_SERVICE_SID)
+      .channels(chatChannelSid)
+      .messages
+      .create(messageResources)
+      .then(message => console.log(message.sid));
+ 
+  } catch (error) {
+    console.error('Error adding message.', error);
+    return reject(error);
+  }
+
+  return resolve(createMessage);
+});
+
 const createProxySession = (
   context, chatChannelSid, toNumber, toName, fromNumber, workerUri
 ) => new Promise(async (resolve, reject) => {
-  const client = Twilio(context.ACCOUNT_SID, context.AUTH_TOKEN);
+  // const client = Twilio(context.ACCOUNT_SID, context.AUTH_TOKEN);
   const proxyClient = client.proxy.services(context.TWILIO_PROXY_SERVICE_SID);
 
   let proxySession;
@@ -157,8 +196,7 @@ const createProxySession = (
   return resolve(proxySession);
 });
 
-exports.handler = async function(context, event, callback) {
-  console.log('Received event with properties:');
+console.log('Received event with properties:');
   Object.keys(event).forEach((key) => {
     console.log(`--${key}:`, event[key]);
   });
@@ -257,7 +295,36 @@ exports.handler = async function(context, event, callback) {
     console.log(`${key}: ${proxySession[key]}`);
     responseBody.proxySession[key] = proxySession[key];
   });
+  
+  let chatMessage;
+  console.log("Starting Chat Message");
+  console.log(chatChannel.sid);
+  console.log(event.message);
+  console.log(context);
+  try {
+    chatMessage = await createMessage(
+      context, chatChannel.sid, toNumber, toName, fromNumber, workerUri, event.message
+    );
+  } catch (error) {
+    response.setStatusCode(error && error.status);
+    response.setBody(error);
+    return callback(null, response);
+  }
+  if (!chatMessage) {
+    response.setStatusCode(500);
+    response.setBody({ message: 'Failed to add message' });
+    return callback(null, response);
+  }
+  console.log('Message added to channel')
+  Object.keys(chatMessage).forEach((key) => {
+    if (key === '_version' || key === '_solution') {
+      return;
+    }
+    console.log(`${key}: ${chatMessage[key]}`);
+    responseBody.chatMessage[key] = chatMessage[key];
+  });
 
   response.setBody(responseBody);
   return callback(null, response);
-};
+
+});

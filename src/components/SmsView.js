@@ -56,43 +56,45 @@ class SmsView extends React.Component {
       .then(resp => {
         console.log("SMS Sent");
         alert(`SMS Message has been sent to ${this.state.fromNumber}. \r\nMessage: ${this.state.smsBody}`);
-        this.setState({ smsBody: ''});
+        this.setState({ smsBody: '', toNumber: ''});
       })
   }
 
   startChat(task) {
     console.log(`Running Start Chat--> toNumber: ${this.state.toNumber} fromNumber: ${this.state.fromNumber}`);
-    // console.log(this.state);
-    // console.log(task);
-    
-    const name = (this.state.name) !== "" ? this.state.name : this.state.toNumber;
-    const smsURL = process.env.REACT_APP_SERVICE_BASE_URL + `/flex-sms-chat?fromNumber=${encodeURIComponent(this.state.fromNumber)}&toName=${encodeURIComponent(name)}&toNumber=${encodeURIComponent(this.state.toNumber)}&workerUri=${encodeURIComponent(this.props.manager.workerClient.attributes.contact_uri)}}`;
-    console.log('URL: ' + smsURL);
-    fetch(smsURL)
-      .then(result => result.json())
-      .then(result => {
-        console.log("Chat Started");
-      });
+    console.log(this.props.manager);
+    console.log(this.props.manager.workerClient.attributes.contact_uri);
+    console.log((this.state.smsBody) !== "" ? this.state.smsBody : "Initial Message");
+    // Set the query for the Twilio Funciton
+    const functionQuery = { 
+      toNumber: this.state.toNumber,
+      fromNumber: this.state.fromNumber,
+      toName: (this.state.name) !== "" ? this.state.name : this.state.toNumber,
+      message: (this.state.smsBody) !== "" ? this.state.smsBody : "Initial Message",
+      workerUri: this.props.manager.workerClient.attributes.contact_uri,
+      Token: this.props.manager.store.getState().flex.session.ssoTokenPayload.token
+    };
+    // Set the HTTP Option for the Twilio Function call
+    const options = {
+      method: 'POST',
+      body: new URLSearchParams(functionQuery),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      }
+    };
+    // Make the function call using Fetch
+    fetch(process.env.REACT_APP_SERVICE_BASE_URL + '/flex-sms-task', options)
+      .then(resp => resp.json())
+      .then(resp => {
+        console.log("SMS Task Created");
+        this.setState({ smsBody: '', toNumber: ''});
+      })
   }
 
   render() { 
 
     if (this.props.task && this.props.task.attributes) { 
       if (this.props.task.channelType === "sms") return (null);
-      // let {
-      //   channelType
-      // } = this.props.task;
-      // let {
-			//   name,
-			//   ani,
-      //   dnis,
-      //   from,
-			//   email,
-      //   address,
-      //   crmid,
-			//   crmurl,
-			//   taskIntent
-      // } = this.props.task.attributes
 
       console.log("Channel Type: ", this.props.task.channelType);
       console.log("Task: ");
@@ -104,9 +106,6 @@ class SmsView extends React.Component {
          <div style={styles.panel3Container}>
         <SubheadingComponent title="Send SMS" />
         <div style={styles.card}>
-          {/* <InfoComponent title="Name" value={name} icon={<PersonIcon />} hr={true} /> */}
-          {/* <InfoComponent title="Customer Phone" value={from} icon={<PhoneIcon />} hr={true} /> */}
-          {/* <InfoComponent title="Send SMS From" value={dnis} icon={<PhoneIcon />} hr={true} /> */}
           <TextField
             id='Name'
             label='Customer Name'
@@ -178,6 +177,7 @@ const styles = {
     width: "100%"
   },
   panel3Container: {
+    paddingTop: '15px',
     boxShadow: 'inset 5px -1px 5px rgb(134 134 134 / 25%)',
     minHeight: 300,
     overflow: 'auto',
