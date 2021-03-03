@@ -64,6 +64,8 @@ This Flex Plugin leverages 2 Twilio Functions, located in the `functions` folder
    * twilio-flex-token-validator
    * node-fetch
    * js-base64
+   * uuid
+   * Make sure twilio is at least 3.57.0 or remove the version requirement
 5. [Deploy Functions](https://www.twilio.com/console/functions/manage) and make sure Check for Valid Twilio signature is unchecked. 
    * flex-sms-task.js
    * send-sms.js
